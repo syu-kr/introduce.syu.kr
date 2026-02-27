@@ -14,11 +14,13 @@ export default function AdminApplicationsPage() {
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isAuthed, setIsAuthed] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
     // 인증 확인
     checkAuth().then((authenticated) => {
+      setIsChecking(false);
       if (!authenticated) {
         router.push("/admin/login");
         return;
@@ -65,6 +67,11 @@ export default function AdminApplicationsPage() {
       app.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       app.studentId.includes(searchQuery),
   );
+
+  // 인증 확인 중이거나 인증되지 않았으면 아무것도 렌더링하지 않음
+  if (isChecking || !isAuthed) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen overflow-x-hidden">
@@ -143,14 +150,7 @@ export default function AdminApplicationsPage() {
       {/* Content */}
       <section className="px-6 pb-32">
         <div className="mx-auto max-w-2xl space-y-6">
-          {!isAuthed ? (
-            <FadeIn>
-              <div className="rounded-2xl border border-border bg-card p-12 text-center text-muted">
-                인증 중...
-              </div>
-            </FadeIn>
-          ) : (
-            <>
+          <>
               {/* Search */}
               <FadeIn>
                 <input
@@ -410,7 +410,6 @@ export default function AdminApplicationsPage() {
                 )}
               </AnimatePresence>
             </>
-          )}
         </div>
       </section>
     </main>
