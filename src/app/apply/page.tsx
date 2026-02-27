@@ -347,12 +347,12 @@ export default function ApplyPage() {
                     >
                       개인정보 처리방침 자세히 보기 →
                     </a>
-                    <label className="mt-4 flex items-start gap-3 cursor-pointer group">
+                    <label className="mt-4 flex items-center gap-3 cursor-pointer group">
                       <input
                         type="checkbox"
                         checked={privacyConsent}
                         onChange={(e) => setPrivacyConsent(e.target.checked)}
-                        className="mt-1 h-4 w-4 cursor-pointer accent-accent"
+                        className="h-4 w-4 cursor-pointer accent-accent"
                       />
                       <span className="text-sm text-muted group-hover:text-foreground transition-colors">
                         개인정보 수집 및 이용에 동의합니다.{" "}
