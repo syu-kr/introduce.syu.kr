@@ -127,7 +127,7 @@ export default function ApplyPage() {
 
       {/* Form */}
       <section className="px-6 pb-32">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-4xl">
           <AnimatePresence mode="wait">
             {submitted ? (
               <motion.div
@@ -163,11 +163,11 @@ export default function ApplyPage() {
               >
                 {/* 기본 정보 */}
                 <FadeIn delay={0.1}>
-                  <fieldset className="rounded-2xl border border-border bg-card p-8">
-                    <legend className="px-2 text-lg font-bold">
+                  <fieldset className="rounded-2xl border border-border bg-card p-6 sm:p-10">
+                    <legend className="px-3 text-xl font-bold">
                       기본 정보
                     </legend>
-                    <div className="mt-4 grid gap-6 sm:grid-cols-2">
+                    <div className="mt-6 grid gap-6 sm:grid-cols-2">
                       <InputField
                         label="이름"
                         required
@@ -245,15 +245,16 @@ export default function ApplyPage() {
 
                 {/* 경험 */}
                 <FadeIn delay={0.2}>
-                  <fieldset className="rounded-2xl border border-border bg-card p-8">
-                    <legend className="px-2 text-lg font-bold">경험</legend>
-                    <div className="mt-4 space-y-6">
+                  <fieldset className="rounded-2xl border border-border bg-card p-6 sm:p-10">
+                    <legend className="px-3 text-xl font-bold">경험</legend>
+                    <div className="mt-6 space-y-6">
                       <TextareaField
                         label="만들어본 프로젝트가 있다면 자유롭게 작성해주세요"
                         value={form.projects}
                         onChange={(v) => update("projects", v)}
                         placeholder="어떤 프로젝트를 어떤 기술로 만들었는지 편하게 적어주세요. 없으면 비워두셔도 됩니다!"
                         optional
+                        maxLength={200}
                       />
                       <TextareaField
                         label="협업 경험이 있다면 작성해주세요"
@@ -261,6 +262,7 @@ export default function ApplyPage() {
                         onChange={(v) => update("collaboration", v)}
                         placeholder="팀 프로젝트, 해커톤, 스터디 등 어떤 형태든 괜찮아요. 없으면 비워두셔도 됩니다!"
                         optional
+                        maxLength={200}
                       />
                     </div>
                   </fieldset>
@@ -268,17 +270,18 @@ export default function ApplyPage() {
 
                 {/* 지원 동기 */}
                 <FadeIn delay={0.3}>
-                  <fieldset className="rounded-2xl border border-border bg-card p-8">
-                    <legend className="px-2 text-lg font-bold">
+                  <fieldset className="rounded-2xl border border-border bg-card p-6 sm:p-10">
+                    <legend className="px-3 text-xl font-bold">
                       지원 동기
                     </legend>
-                    <div className="mt-4 space-y-6">
+                    <div className="mt-6 space-y-6">
                       <TextareaField
                         label="왜 SYU KR에 지원했나요?"
                         required
                         value={form.motivation}
                         onChange={(v) => update("motivation", v)}
                         placeholder="편하게 적어주세요. 거창하지 않아도 됩니다!"
+                        maxLength={400}
                       />
                       <TextareaField
                         label="팀에 합류하고 하고 싶은 아이디어나 계획이 있나요?"
@@ -286,6 +289,7 @@ export default function ApplyPage() {
                         onChange={(v) => update("ideas", v)}
                         placeholder="만들어보고 싶은 서비스, 배우고 싶은 기술, 또는 팀에서 하고 싶은 역할 등 자유롭게 적어주세요!"
                         optional
+                        maxLength={200}
                       />
                     </div>
                   </fieldset>
@@ -429,6 +433,7 @@ function TextareaField({
   placeholder,
   required,
   optional,
+  maxLength,
 }: {
   label: string;
   value: string;
@@ -436,6 +441,7 @@ function TextareaField({
   placeholder?: string;
   required?: boolean;
   optional?: boolean;
+  maxLength?: number;
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -446,11 +452,27 @@ function TextareaField({
       <textarea
         required={required}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          if (maxLength && e.target.value.length > maxLength) return;
+          onChange(e.target.value);
+        }}
         placeholder={placeholder}
-        rows={4}
+        rows={5}
+        maxLength={maxLength}
         className="resize-none rounded-xl border border-border bg-background px-4 py-3 text-foreground placeholder:text-muted/40 outline-none transition-colors focus:border-accent"
       />
+      {maxLength && (
+        <div className="text-xs text-muted/60 text-right">
+          <span
+            className={
+              value.length >= maxLength ? "text-accent font-medium" : ""
+            }
+          >
+            {value.length}
+          </span>
+          <span>/{maxLength}자</span>
+        </div>
+      )}
     </div>
   );
 }
