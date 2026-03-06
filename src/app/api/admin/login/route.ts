@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getIronSession } from "iron-session";
+import { sessionOptions, SessionData } from "@/lib/session";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,21 +22,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 세션 토큰 생성
-    const token = Buffer.from(
-      JSON.stringify({ authenticated: true, timestamp: Date.now() }),
-    ).toString("base64");
-
     const response = NextResponse.json({ success: true });
-
-    // HttpOnly 쿠키로 토큰 설정
-    response.cookies.set("admin_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 60 * 60 * 24, // 24시간
-    });
+    const session = await getIronSession<SessionData>(request, response, sessionOptions);
+    session.authenticated = true;
+    await session.save();
 
     return response;
   } catch (error) {

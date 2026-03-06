@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { getIronSession } from "iron-session";
+import { sessionOptions, SessionData } from "@/lib/session";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // POST /api/applications (지원서 제출)은 인증 불필요
@@ -19,23 +21,12 @@ export function middleware(request: NextRequest) {
     pathname === "/api/admin/logout";
 
   if (isProtectedApi) {
-    const token = request.cookies.get("admin_token")?.value;
+    const response = NextResponse.next();
+    const session = await getIronSession<SessionData>(request, response, sessionOptions);
 
-    if (!token) {
+    if (!session.authenticated) {
       return NextResponse.json(
         { error: "인증이 필요합니다." },
-        { status: 401 },
-      );
-    }
-
-    try {
-      const decoded = JSON.parse(Buffer.from(token, "base64").toString());
-      if (!decoded.authenticated) {
-        throw new Error("Invalid token");
-      }
-    } catch {
-      return NextResponse.json(
-        { error: "유효하지 않은 인증입니다." },
         { status: 401 },
       );
     }

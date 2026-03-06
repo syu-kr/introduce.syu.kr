@@ -1,6 +1,17 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { getIronSession } from "iron-session";
+import { sessionOptions, SessionData } from "@/lib/session";
 
-export async function GET() {
-  // 이 API는 쿠키가 존재하는지만 확인 — 실제 검증은 middleware에서
-  return NextResponse.json({ authenticated: true });
+export async function GET(request: NextRequest) {
+  const response = NextResponse.json({ authenticated: true });
+  const session = await getIronSession<SessionData>(request, response, sessionOptions);
+
+  if (!session.authenticated) {
+    return NextResponse.json(
+      { error: "인증이 필요합니다." },
+      { status: 401 },
+    );
+  }
+
+  return response;
 }
